@@ -1,18 +1,34 @@
 
-import { Router, Request, Response } from "express";
-import fileController from "../controllers/fileController";
-import folderController from "../controllers/folderController";
+import { Router } from "express";
+
+
+
+
 const router = Router();
 
 //Endpoints
-router.get('/folder/:name:path:count');//count пагинация param ctime noEmpty
-router.post('/folder/:dest/:name');
-router.put('/folder/:name/:newName'); // newDest
-router.delete('/folder/:name');
 
-router.get('/file/:name/:param');//param ctime data - получить содержимое 
-router.post('/file/:dest');
-router.put('/file/:name/:newName'); // new Data перезапись
-router.delete('/file/:name');
+//File
+//:dest = path + fileName
+router.post('/file/create/:dest');
+router.get('file/download/:dest');
+router.get('/file/getView/:dest');
+router.put('/file/update/changeProp/:dest');
+router.put('/file/update/rewrite/:dest');
+router.delete('/file/:dest');
+
+//:dest = path + folderName
+router.post('/folder/create/:dest');
+//count пагинация param ctime noEmpty
+//extended = array<idForFullInfo>
+router.get('/folder/getView/:dest:extended:offset:count');
+router.get('/folder/download/:dest');
+router.put('/folder/update/:dest:newName'); 
+router.delete('/folder/:dest');
+
+
+
 
 export default router;
+
+
