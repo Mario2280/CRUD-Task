@@ -33,13 +33,14 @@ const router = Router();
 //Endpoints
 
 //File
-//:dest = path(Cannot up;oad files with the same names)
-//query names a,c,v,b
+//:dest = path(Cannot upload files with the same names)
+//query names a,c,v,b without ext
 router.post('/file/create', upload, FileController.create);
 //:dest = path + fileName
 router.get('/file/download/:dest', FileController.read);
+//:dest = path + fileName + ext
 router.get('/file/getView/:dest', FileController.getView);
-//Prop in json & dest 
+//Prop in json & dest in query
 router.put('/file/update/changeProp', FileController.changeProp);
 router.put('/file/update/rewrite/:dest', FileController.rewrite);
 router.delete('file/:dest', FileController.delete);

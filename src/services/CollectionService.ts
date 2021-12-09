@@ -1,6 +1,6 @@
 import Collection from "../models/CollectionSchema";
 import { parse } from "path";
-
+import { ICollectionSchema } from '../models/CollectionSchema'
 interface IFile {
     name?: string,
     path?: string,
@@ -26,9 +26,10 @@ class CollectionService {
 
     }
 
-    async getViewFile(dest: string) {
+    async getViewFile(dest: string): Promise<ICollectionSchema | null> {
         const parsedDest = parse(dest);
-        return Collection.find({ path: parsedDest.dir, name: parsedDest.name }).lean();
+        const result = await Collection.findOne({ path: parsedDest.dir, name: parsedDest.name }).lean();
+        return result;
     }
 
     async rewrite(dest: string) {
@@ -44,15 +45,15 @@ class CollectionService {
 
     }
 
-    async changeCollectionProp(dest: string, newProp: IFile) {
+    async changeCollectionProp(dest: string, newProp: ICollectionSchema) {
         const parsedDest = parse(dest);
-        return Collection.findOneAndUpdate({ path: parsedDest.dir, name: parsedDest.name }, newProp).lean();
+        await Collection.findOneAndUpdate({ path: parsedDest.dir, name: parsedDest.name }, newProp);
     }
 
     async deleteCollection(dest: string) {
 
     }
-   
+
 
 
 

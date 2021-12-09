@@ -3,42 +3,48 @@ import fileService from "../services/CollectionService";
 import ModIControl from "./IControl"
 import { join, parse } from "path";
 import { copyNameArrForDB } from "../middlewares/multer"
-const STORAGE: string = './DiskStorage';
-import { rename } from "fs";
+const STORAGE: string = join(__dirname, '../../DiskStorage/');
+import { rename } from "fs/promises";
 
-function changePropInFs(props: { name?: string, dest: string, ext?: string, newPath?: string}) {
-   
-    // const candidate = fileService.getViewFile(join(props.dest, props.name));
 
-    // let rebuiltNewFullPath = '';
-    // if (props.name) {
-    //     if (!candidate) {
-    //         throw new Error('File not found');
-    //     } else {
-    //         if(props.newPath) {
-    //             rename(join(props.dest,name, props.newPath)
-    //         } else {
-
-    //         }
-    //     }
-    // } else {
-
-    // }
+async function changePropInFs(props: { name?: string, path?: string, extname?: string }, relativePath: string) {
+    const absolutePath = join(STORAGE, relativePath);
+    const candidate = await fileService.getViewFile(absolutePath);
+    if (!candidate) {
+        throw new Error(`File not found`);
+    } else {
+        const newPath = props.path ?? parse(relativePath).dir,
+            newName = props.name ?? parse(relativePath).name,
+            newExtname = props.extname ?? parse(relativePath).ext;
+        const newDest = join(STORAGE, newPath, `${newName}${newExtname}`),
+            oldDest = join(STORAGE, relativePath);
+        if (!(newDest.indexOf(STORAGE) == 0)) {
+            throw new Error(`Incorrect new dest`);
+        }
+        await rename(oldDest, newDest);
+        const Prop = {
+            path: parse(newDest).dir,
+            extname: parse(newDest).ext,
+            name: parse(newDest).name
+        };
+        await fileService.changeCollectionProp(absolutePath, Prop);
+        //return fileInDB;
+    }
 }
 
 class FileController implements ModIControl {
     async create(req: Request, res: Response) {
         //validate dest exist 
         try {
-            //This is relative path 
             let rebuiltPath;
-            for (let i = 0; i < copyNameArrForDB.length; i++) {
+            for  (let i = 0; i < copyNameArrForDB.length; i++) {
                 rebuiltPath = join(
                     STORAGE,
                     <string>req.query.dest,
                     copyNameArrForDB[i]);
-                fileService.createFile(rebuiltPath)
+                    await fileService.createFile(rebuiltPath)
             }
+            res.status(200).send("OK");
         }
         catch (error) {
             res.status(500).send((<Error>error).message);
@@ -78,16 +84,17 @@ class FileController implements ModIControl {
         try {
             //validate req.body
             if (req.query.dest) {
-                changePropInFs(req.body);
+                await changePropInFs(req.body, <string>req.query.dest);
+                res.send(`File was change`);
             } else {
                 throw new Error("Dest is required");
             }
 
-            res.send("OK");
         } catch (error) {
             res.status(400).send((<Error>error).message);
         }
     }
+
     async rewrite(req: Request, res: Response) {
         try {
             //const Editable = await 

@@ -1,6 +1,15 @@
 //@ts-nocheck
 import { Schema, model } from 'mongoose';
 
+interface ICollectionSchema {
+    name?: string;
+    path?: string;
+    isFile?: boolean;
+    isEmpty?: boolean;
+    extname?: string;
+    ctime?:Date;
+  }
+
 const CollectionSchema = new Schema({
     name: {
         type: String,
@@ -29,5 +38,5 @@ const CollectionSchema = new Schema({
         required: function () { return this.isFile ? true : false; }
     },
 });
-
-export default model("Collection", CollectionSchema);
+export {ICollectionSchema};
+export default model<ICollectionSchema>("Collection", CollectionSchema);
