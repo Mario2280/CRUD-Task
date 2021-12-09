@@ -1,11 +1,8 @@
 import Collection from "../models/CollectionSchema";
 import { parse } from "path";
 import { ICollectionSchema } from '../models/CollectionSchema'
-interface IFile {
-    name?: string,
-    path?: string,
-    extname?: string,
-}
+
+
 
 class CollectionService {
 
@@ -20,11 +17,6 @@ class CollectionService {
         await newFile.save();
     }
 
-    async downloadFile(dest: string) {
-
-
-
-    }
 
     async getViewFile(dest: string): Promise<ICollectionSchema | null> {
         const parsedDest = parse(dest);
@@ -51,7 +43,8 @@ class CollectionService {
     }
 
     async deleteCollection(dest: string) {
-
+        const parsedDest = parse(dest);
+        await Collection.findOneAndRemove({path: parsedDest.dir, name: parsedDest.name});
     }
 
 

@@ -1,16 +1,15 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 
 interface IControl {
-    create(req: Request, res: Response, next: NextFunction): Promise<void>;
-    read(req: Request, res: Response, next: NextFunction): Promise<void>;
-    update(req: Request, res: Response, next: NextFunction): Promise<void>;
-    delete(req: Request, res: Response, next: NextFunction): Promise<void>;
+    create(req: Request, res: Response): Promise<void>;
+    read(req: Request, res: Response): Promise<void>;
+    update(req: Request, res: Response): Promise<void>;
+    delete(req: Request, res: Response): Promise<void>;
 }
 
 interface ModIControl extends IControl {
-    getView(req: Request, res: Response, next: NextFunction): Promise<void>;
-    changeProp(req: Request, res: Response, next: NextFunction): Promise<void>;
-    rewrite(req: Request, res: Response, next: NextFunction): Promise<void>;
+    getView(req: Request, res: Response): Promise<void>;
+    rewrite(req: Request, res: Response): Promise<void>;
 }
 
 export default ModIControl;

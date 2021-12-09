@@ -2,7 +2,7 @@ import ModIControl from "./IControl"
 import {NextFunction, Request, Response} from "express";
 
 class FolferController implements ModIControl {
-    async create(req: Request, res: Response, next: NextFunction) {
+    async create(req: Request, res: Response) {
 
         // try {
         //     if(!req.query.hasOwnProperty('path') || !req.query.path?.length || !req.query.path.toString().trim()){
@@ -31,42 +31,42 @@ class FolferController implements ModIControl {
         });
         
     }
-    async read(req: Request, res: Response, next: NextFunction) {
+    async read(req: Request, res: Response) {
         try {
             
         } catch (error) {
             
         }
     }
-    async update(req: Request, res: Response, next: NextFunction) {
+    async update(req: Request, res: Response) {
         try {
             
         } catch (error) {
             
         }
     }
-    async delete(req: Request, res: Response, next: NextFunction) {
+    async delete(req: Request, res: Response) {
         try {
             
         } catch (error) {
             
         }
     }
-    async getView(req: Request, res: Response, next: NextFunction) {
+    async getView(req: Request, res: Response) {
         try {
             
         } catch (error) {
             
         }
     }
-    async changeProp(req: Request, res: Response, next: NextFunction) {
+    async changeProp(req: Request, res: Response) {
         try {
             
         } catch (error) {
             
         }
     }
-    async rewrite(req: Request, res: Response, next: NextFunction) {
+    async rewrite(req: Request, res: Response) {
         try {
             
         } catch (error) {

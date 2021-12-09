@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import fileService from "../services/CollectionService";
 import ModIControl from "./IControl"
 import { join, parse } from "path";
 import { copyNameArrForDB } from "../middlewares/multer"
 const STORAGE: string = join(__dirname, '../../DiskStorage/');
-import { rename } from "fs/promises";
+import { rename, unlink } from "fs/promises";
 
 
 async function changePropInFs(props: { name?: string, path?: string, extname?: string }, relativePath: string) {
@@ -37,12 +37,12 @@ class FileController implements ModIControl {
         //validate dest exist 
         try {
             let rebuiltPath;
-            for  (let i = 0; i < copyNameArrForDB.length; i++) {
+            for (let i = 0; i < copyNameArrForDB.length; i++) {
                 rebuiltPath = join(
                     STORAGE,
                     <string>req.query.dest,
                     copyNameArrForDB[i]);
-                    await fileService.createFile(rebuiltPath)
+                await fileService.createFile(rebuiltPath)
             }
             res.status(200).send("OK");
         }
@@ -51,36 +51,20 @@ class FileController implements ModIControl {
         }
 
     }
-
     async read(req: Request, res: Response) {
         try {
+            //validate path
+            if (req.query.dest) {
+                res.download(join(STORAGE, <string>req.query.dest));
+            } else {
+                throw new Error("Dest is required");
+            }
 
         } catch (error) {
-
+            res.status(400).send((<Error>error).message);
         }
     }
     async update(req: Request, res: Response) {
-        try {
-
-        } catch (error) {
-
-        }
-    }
-    async delete(req: Request, res: Response) {
-        try {
-
-        } catch (error) {
-
-        }
-    }
-    async getView(req: Request, res: Response) {
-        try {
-
-        } catch (error) {
-
-        }
-    }
-    async changeProp(req: Request, res: Response) {
         try {
             //validate req.body
             if (req.query.dest) {
@@ -94,12 +78,30 @@ class FileController implements ModIControl {
             res.status(400).send((<Error>error).message);
         }
     }
-
+    async delete(req: Request, res: Response) {
+        try {
+            const fullPath = join(STORAGE, <string>req.query.dest);
+            await unlink(fullPath);
+            await fileService.deleteCollection(fullPath);
+            res.status(200).send('File was deleted');
+        } catch (error) {
+            res.status(400).send((<Error>error).message);
+        }
+    }
+    async getView(req: Request, res: Response) {
+        try {
+            const fullPath = join(STORAGE, <string>req.query.dest);
+            const result = await fileService.getViewFile(fullPath);
+            res.status(200).send(result);
+        } catch (error) {
+            res.status(400).send((<Error>error).message);
+        }
+    }
     async rewrite(req: Request, res: Response) {
         try {
-            //const Editable = await 
+            res.status(200).send("File updated");
         } catch (error) {
-
+            res.status(400).send((<Error>error).message);
         }
     }
 

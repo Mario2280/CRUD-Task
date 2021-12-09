@@ -37,13 +37,15 @@ const router = Router();
 //query names a,c,v,b without ext
 router.post('/file/create', upload, FileController.create);
 //:dest = path + fileName
-router.get('/file/download/:dest', FileController.read);
+router.get('/file/download', FileController.read);
 //:dest = path + fileName + ext
-router.get('/file/getView/:dest', FileController.getView);
+router.get('/file/getView', FileController.getView);
 //Prop in json & dest in query
-router.put('/file/update/changeProp', FileController.changeProp);
-router.put('/file/update/rewrite/:dest', FileController.rewrite);
-router.delete('file/:dest', FileController.delete);
+router.put('/file/update/changeProp', FileController.update);
+//:dest = path(Cannot upload files with the same names)
+//query names a,c,v,b without ext
+router.put('/file/update/rewrite',upload, FileController.rewrite);
+router.delete('/file', FileController.delete);
 
 //:dest = path + folderName
 router.post('/folder/create/:dest', FolderController.create);
