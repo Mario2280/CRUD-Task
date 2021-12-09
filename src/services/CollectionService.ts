@@ -1,8 +1,26 @@
 import Collection from "../models/CollectionSchema";
-import { parse } from "path";
+import { parse, sep, ParsedPath, dirname, basename, join } from "path";
 import { ICollectionSchema } from '../models/CollectionSchema'
+import { isNullOrUndefined } from "util";
 
+interface INewProp {
+    name?: string;
+    path?: string;
+    extname?: string;
+}
 
+const CheckAndChangeEmptyStatusParentFolder = async function (oldDest: string | '', newDest: string | '') {
+    if (oldDest !== newDest) {
+        if (!oldDest) {
+            await Collection.findOneAndUpdate({ path: dirname(newDest), name: basename(newDest) }, { isEmpty: false });
+        } else if (!newDest) {
+            const anyFileByTheWay = await Collection.findOne({ path: oldDest }).lean();
+            if (!anyFileByTheWay) {
+                await Collection.findOneAndUpdate({ path: dirname(oldDest), name: basename(oldDest) }, { isEmpty: true });
+            }
+        }
+    }
+}
 
 class CollectionService {
 
@@ -15,8 +33,8 @@ class CollectionService {
             extname: parsedDest.ext
         });
         await newFile.save();
+        await CheckAndChangeEmptyStatusParentFolder('', parsedDest.dir);
     }
-
 
     async getViewFile(dest: string): Promise<ICollectionSchema | null> {
         const parsedDest = parse(dest);
@@ -24,34 +42,55 @@ class CollectionService {
         return result;
     }
 
-    async rewrite(dest: string) {
-
-    }
     async createFolder(dest: string) {
-
+        const candidate = await Collection.findOne({ path: dest }).lean();
+        if (candidate) {
+            throw new Error(`Folder already exists`);
+        } else {
+            const parsedDest = parse(dest);
+            const newFolder = new Collection({
+                name: parsedDest.name,
+                path: parsedDest.dir,
+                isFile: false,
+                isEmpty: true,
+            });
+            await newFolder.save();
+            await CheckAndChangeEmptyStatusParentFolder('', parsedDest.dir);
+        }
     }
-    async getViewFolder(dest: string) {
-
+    async getViewFolder(dest: string, extended: Array<string>, offset: number, count: number, sortField?: string) {
+        let sortBy;
+        if (sortField && Collection.hasOwnProperty(sortField)) {
+            sortBy = sortField;
+        }
+        const View = await Collection.find({ path: dirname(dest), name: basename(dest) }).sort({sortBy: 1})
+            .select('_id').skip(offset ?? 0).limit(count ?? 0).lean();
+        if (extended.length) {
+            extended.forEach(async el => {
+                let extendedFile = await this.getViewFile(el);
+                if (extendedFile) {
+                    View.push(extendedFile);
+                }
+            });
+        }
+        return View;
     }
-    async downloadFolder(dest: string) {
 
-    }
-
-    async changeCollectionProp(dest: string, newProp: ICollectionSchema) {
+    async changeCollectionProp(dest: string, newProp: INewProp) {
         const parsedDest = parse(dest);
-        await Collection.findOneAndUpdate({ path: parsedDest.dir, name: parsedDest.name }, newProp);
+        const deleted = await Collection.findOneAndUpdate({ path: parsedDest.dir, name: parsedDest.name }, newProp).lean();
+        if (deleted && newProp.path) {
+            await CheckAndChangeEmptyStatusParentFolder(deleted.path, newProp.path);
+        }
     }
 
     async deleteCollection(dest: string) {
         const parsedDest = parse(dest);
-        await Collection.findOneAndRemove({path: parsedDest.dir, name: parsedDest.name});
+        const deleted = await Collection.findOneAndDelete({ path: parsedDest.dir, name: parsedDest.name }).lean();
+        if (deleted) {
+            await CheckAndChangeEmptyStatusParentFolder(deleted.path, '');
+        }
     }
-
-
-
-
-
-
 }
 
 export default new CollectionService();

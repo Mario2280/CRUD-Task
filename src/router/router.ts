@@ -48,13 +48,17 @@ router.put('/file/update/rewrite',upload, FileController.rewrite);
 router.delete('/file', FileController.delete);
 
 //:dest = path + folderName
-router.post('/folder/create/:dest', FolderController.create);
+router.post('/folder/create', FolderController.create);
 //count пагинация param ctime noEmpty
 //extended = array<idForFullInfo>
-router.get('/folder/getView/:dest:extended:offset:count', FolderController.getView);
-router.get('/folder/download/:dest', FolderController.read);
-router.put('/folder/update/:dest:newName', FolderController.changeProp);
-router.delete('/folder/:dest', FolderController.delete);
+//:dest:extended:offset:count:sort(name of field)
+router.get('/folder/getView', FolderController.getView);
+///:dest
+router.get('/folder/download', FolderController.read);
+//:dest:newName
+router.put('/folder/update', FolderController.update);
+//:dest
+router.delete('/folder', FolderController.delete);
 
 
 

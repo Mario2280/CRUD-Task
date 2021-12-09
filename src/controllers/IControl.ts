@@ -12,4 +12,5 @@ interface ModIControl extends IControl {
     rewrite(req: Request, res: Response): Promise<void>;
 }
 
+export {IControl};
 export default ModIControl;

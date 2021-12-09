@@ -2,12 +2,12 @@
 import { Schema, model } from 'mongoose';
 
 interface ICollectionSchema {
-    name?: string;
-    path?: string;
-    isFile?: boolean;
+    name: string;
+    path: string;
+    isFile: boolean;
     isEmpty?: boolean;
     extname?: string;
-    ctime?:Date;
+    ctime:Date;
   }
 
 const CollectionSchema = new Schema({
