@@ -89,35 +89,6 @@ const Upload = function (req: Request, res: Response, next: NextFunction) {
         downloader.isPut = false;
         next();
     });
-    // copyNameArrForDB = [];
-    // ReadNewFileNames(req);
-    // if (req.method === 'PUT') {
-    //     isPut = true;
-    //     myMulter.single('file')(req, res, (err) => {
-    //         if (err || nameArr.length !== 0) {
-    //             if (err instanceof multer.MulterError) {
-    //                 res.status(400).send(err.code);
-    //             } else {
-    //                 res.send(err.message ?? `Not all files were uploaded or you specified a wrong quantity of query parameters`);
-    //             }
-    //         }
-    //         nameArr = [];
-    //         isPut = false;
-    //         next();
-    //     });
-    // } else {
-    //     myMulter.fields([{ name: 'file', maxCount: 3 }])(req, res, (err) => {
-    //         if (err || nameArr.length !== 0) {
-    //             if (err instanceof multer.MulterError) {
-    //                 res.status(400).send(err.code);
-    //             } else {
-    //                 res.send(err?.message ?? `Not all files were uploaded or you specified a wrong quantity of query parameters`);
-    //             }
-    //         }
-    //         nameArr = [];
-    //         next();
-    //     });
-    // }
 }
 
 
