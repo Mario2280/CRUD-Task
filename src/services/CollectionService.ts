@@ -1,5 +1,5 @@
 import Collection from "../models/CollectionSchema";
-import { parse, sep, ParsedPath, dirname, basename, join } from "path";
+import { parse, dirname, basename, join } from "path";
 import { ICollectionSchema } from '../models/CollectionSchema';
 
 interface INewProp {
@@ -57,14 +57,15 @@ class CollectionService {
     }
     async getViewFolder(dest: string, extended: Array<string>, offset: number, count: number, sortField?: string) {
         let sortBy;
-        if (sortField && Collection.hasOwnProperty(sortField)) {
+        const hasSortFieldProperty = Object.prototype.hasOwnProperty.call(Collection, <string>sortField);
+        if (sortField && hasSortFieldProperty) {
             sortBy = `+${sortField}`;
         }
         const View = await Collection.find({ path: dest }).sort(sortBy)
             .select('name path extname').skip(offset ?? 0).limit(count ?? 0).lean();
         if (extended.length) {
-            for await (let el of extended) {
-                let extendedFile = await Collection.findById(el).select(['name', 'path', 'extname', 'ctime']).lean();
+            for await (const el of extended) {
+                const extendedFile = await Collection.findById(el).select(['name', 'path', 'extname', 'ctime']).lean();
                 if (extendedFile) {
                     View.push(extendedFile);
                 }
@@ -79,7 +80,7 @@ class CollectionService {
             await CheckAndChangeEmptyStatusParentFolder(deleted.path, newProp.path);
             const reg = new RegExp(join(deleted.path, deleted.name).replaceAll('\\', '\\\\'));
             const pathToUpdate = await Collection.find({ path: { $regex: reg } });
-            for (let el of pathToUpdate) {
+            for (const el of pathToUpdate) {
                 el.path = el.path.replace(reg, join(newProp.path, newProp.name ?? deleted.name));
                 el.save();
             }

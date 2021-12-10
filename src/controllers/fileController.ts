@@ -61,7 +61,7 @@ class FileController implements ModIControl {
             }
 
         } catch (error) {
-            res.status(400).send((<Error>error).message);
+            res.status(500).send((<Error>error).message);
         }
     }
     async update(req: Request, res: Response) {
@@ -75,7 +75,7 @@ class FileController implements ModIControl {
             }
 
         } catch (error) {
-            res.status(400).send((<Error>error).message);
+            res.status(500).send((<Error>error).message);
         }
     }
     async delete(req: Request, res: Response) {
@@ -85,7 +85,7 @@ class FileController implements ModIControl {
             await fileService.deleteCollection(fullPath);
             res.status(200).send('File was deleted');
         } catch (error) {
-            res.status(400).send((<Error>error).message);
+            res.status(500).send((<Error>error).message);
         }
     }
     async getView(req: Request, res: Response) {
@@ -94,14 +94,14 @@ class FileController implements ModIControl {
             const result = await fileService.getViewFile(fullPath);
             res.status(200).send(result);
         } catch (error) {
-            res.status(400).send((<Error>error).message);
+            res.status(500).send((<Error>error).message);
         }
     }
     async rewrite(req: Request, res: Response) {
         try {
             res.status(200).send("File updated");
         } catch (error) {
-            res.status(400).send((<Error>error).message);
+            res.status(500).send((<Error>error).message);
         }
     }
 

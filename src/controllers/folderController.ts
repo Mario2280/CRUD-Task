@@ -24,7 +24,7 @@ class FolferController implements IControl {
                 throw new Error("Dest is required");
             }
         } catch (error) {
-            res.status(400).send((<Error>error).message);
+            res.status(500).send((<Error>error).message);
         }
     }
     async read(req: Request, res: Response) {
@@ -42,7 +42,7 @@ class FolferController implements IControl {
             tar.c({ gzip: true }, [absolutePath]).pipe(streamForZip);
 
         } catch (error) {
-            res.status(400).send((<Error>error).message);
+            res.status(500).send((<Error>error).message);
         }
     }
     async delete(req: Request, res: Response) {
@@ -52,7 +52,7 @@ class FolferController implements IControl {
             await folderService.deleteCollection(absolutePath);
             res.status(200).send("Folder deleted");
         } catch (error) {
-            res.status(400).send((<Error>error).message);
+            res.status(500).send((<Error>error).message);
         }
     }
     async getView(req: Request, res: Response) {
@@ -81,7 +81,7 @@ class FolferController implements IControl {
                 }
             }
         } catch (error) {
-            res.status(400).send((<Error>error).message);
+            res.status(500).send((<Error>error).message);
         }
     }
     async update(req: Request, res: Response) {
@@ -96,7 +96,7 @@ class FolferController implements IControl {
             await folderService.changeCollectionProp(absoluteOldPath, newProp);
             res.status(200).send("Folder name changed");
         } catch (error) {
-            res.status(400).send((<Error>error).message);
+            res.status(500).send((<Error>error).message);
         }
     }
 }

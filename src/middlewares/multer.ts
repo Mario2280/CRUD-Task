@@ -33,7 +33,7 @@ class Multer {
         storage: this.#storage,
         fileFilter: (req, file, cb) => {
             if (!this.isPut) {
-                let rev = this.nameArr.reverse();
+                const rev = this.nameArr.reverse();
                 rev.forEach(async el => {
                     const testPath = join(this.#STORAGE, <string>req.query.dest, el);
                     await fileService.getViewFile(testPath).then(res => {
