@@ -58,9 +58,9 @@ class CollectionService {
     async getViewFolder(dest: string, extended: Array<string>, offset: number, count: number, sortField?: string) {
         let sortBy;
         if (sortField && Collection.hasOwnProperty(sortField)) {
-            sortBy = sortField;
+            sortBy = `+${sortField}`;
         }
-        const View = await Collection.find({ path: dest }).sort({ sortBy: 1 })
+        const View = await Collection.find({ path: dest }).sort(sortBy)
             .select('name path extname').skip(offset ?? 0).limit(count ?? 0).lean();
         if (extended.length) {
             for await (let el of extended) {
