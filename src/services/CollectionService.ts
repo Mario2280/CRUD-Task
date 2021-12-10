@@ -77,15 +77,9 @@ class CollectionService {
         const deleted = await Collection.findOneAndUpdate({ path: parsedDest.dir, name: parsedDest.name }, newProp).lean();
         if (deleted && newProp.path) {
             await CheckAndChangeEmptyStatusParentFolder(deleted.path, newProp.path);
-            //, {path: join(newProp.path,newProp.name ?? deleted.name)}
-            //Dont Work
             const reg = new RegExp(join(deleted.path, deleted.name).replaceAll('\\', '\\\\'));
-            const reg1 = /E:\\TestTaskCRUD\\DiskStorage\\a/;
-            //const pathToUpdate = await Collection.find({ path: { $regex: new RegExp(`E:\\TestTaskCRUD\\DiskStorage\\a`) , $options: 'i' } });
             const pathToUpdate = await Collection.find({ path: { $regex: reg } });
             for (let el of pathToUpdate) {
-                console.log(join(newProp.path, newProp.name ?? deleted.name));
-                console.log(el.path.replace(reg, join(newProp.path, newProp.name ?? deleted.name)));
                 el.path = el.path.replace(reg, join(newProp.path, newProp.name ?? deleted.name));
                 el.save();
             }

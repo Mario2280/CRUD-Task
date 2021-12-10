@@ -10,6 +10,8 @@ const router = Router();
 //File
 //:dest = path(Cannot upload files with the same names)
 //query names a,c,v,b without ext
+//validators
+//path to upload exists?
 router.post('/file/create', upload, FileController.create);
 //:dest = path + fileName
 router.get('/file/download', FileController.read);
