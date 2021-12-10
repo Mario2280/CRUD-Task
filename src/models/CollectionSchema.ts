@@ -7,8 +7,8 @@ interface ICollectionSchema {
     isFile: boolean;
     isEmpty?: boolean;
     extname?: string;
-    ctime:Date;
-  }
+    ctime: Date;
+}
 
 const CollectionSchema = new Schema({
     name: {
@@ -31,12 +31,12 @@ const CollectionSchema = new Schema({
     },
     isEmpty: {
         type: Boolean,
-        required: function () { return this.isFile ? false : true; }
+        required: function () { return !this.isFile; }
     },
     extname: {
         type: String,
-        required: function () { return this.isFile ? true : false; }
+        required: function () { return this.isFile; }
     },
 });
-export {ICollectionSchema};
+export { ICollectionSchema };
 export default model<ICollectionSchema>("Collection", CollectionSchema);
