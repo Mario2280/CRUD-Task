@@ -13,7 +13,7 @@ const CheckAndChangeEmptyStatusParentFolder = async function (oldDest: string | 
         if (!oldDest) {
             await Collection.findOneAndUpdate({ path: dirname(newDest), name: basename(newDest) }, { isEmpty: false });
         } else if (!newDest) {
-            const anyFileByTheWay = await Collection.findOne({ path: oldDest }).lean();
+            const anyFileByTheWay = await Collection.exists({ path: oldDest });
             if (!anyFileByTheWay) {
                 await Collection.findOneAndUpdate({ path: dirname(oldDest), name: basename(oldDest) }, { isEmpty: true });
             }
@@ -25,14 +25,24 @@ class CollectionService {
 
     async createFile(dest: string) {
         const parsedDest = parse(dest);
-        const newFile = new Collection({
-            name: parsedDest.name,
+        const candidate = await Collection.exists({
             path: parsedDest.dir,
-            isFile: true,
-            extname: parsedDest.ext
-        });
-        await newFile.save();
-        await CheckAndChangeEmptyStatusParentFolder('', parsedDest.dir);
+            name:parsedDest.name,
+            extname:parsedDest.ext 
+            });
+        if (candidate) {
+            throw new Error(`File ${parsedDest.name} already exists`);
+        } else {
+            const newFile = new Collection({
+                name: parsedDest.name,
+                path: parsedDest.dir,
+                isFile: true,
+                extname: parsedDest.ext
+            });
+            await newFile.save();
+            await CheckAndChangeEmptyStatusParentFolder('', parsedDest.dir);
+        }
+        
     }
     async getViewFile(dest: string): Promise<ICollectionSchema | null> {
         const parsedDest = parse(dest);
@@ -40,11 +50,11 @@ class CollectionService {
         return result;
     }
     async createFolder(dest: string) {
-        const candidate = await Collection.findOne({ path: dest }).lean();
+        const parsedDest = parse(dest);
+        const candidate = await Collection.exists({ path: dest });
         if (candidate) {
-            throw new Error(`Folder already exists`);
-        } else {
-            const parsedDest = parse(dest);
+            throw new Error(`Folder ${parsedDest.name} already exists`);
+        } else {            
             const newFolder = new Collection({
                 name: parsedDest.name,
                 path: parsedDest.dir,

@@ -34,7 +34,6 @@ class FolferController implements IControl {
             const streamForZip = createWriteStream(downloadZip).on('finish', () => {
                 res.setHeader('Content-Type', 'application/x-gzip');
                 res.download(downloadZip);
-                //res.status(200).send("OK");
             })
             res.on('close', async () => {
                 await unlink(downloadZip);

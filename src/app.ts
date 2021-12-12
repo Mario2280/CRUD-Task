@@ -2,7 +2,6 @@ import express, { Application } from "express";
 import { config } from "dotenv"
 import router from "./router/router";
 import mongoose from "mongoose";
-
 const app: Application = express();
 config();
 const PORT = process.env.PORT || 3000;

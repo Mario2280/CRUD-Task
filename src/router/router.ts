@@ -3,6 +3,7 @@ import FolderController from "../controllers/folderController";
 import { Router } from "express";
 import upload from "../middlewares/multer";
 
+import createValidator, {checkErr} from "../middlewares/pathValidator";
 const router = Router();
 
 //Endpoints
@@ -12,7 +13,7 @@ const router = Router();
 //query names a,c,v,b without ext
 //validators
 //path to upload exists?
-router.post('/file/create', upload, FileController.create);
+router.post('/file/create', createValidator, checkErr , upload, FileController.create);
 //:dest = path + fileName
 router.get('/file/download', FileController.read);
 //:dest = path + fileName + ext
