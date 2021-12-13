@@ -26,17 +26,17 @@ router.put('/file/update/rewrite', checkDest, checkErr, upload, FileController.r
 router.delete('/file', checkDest, checkErr, FileController.delete);
 
 //:dest = path + folderName
-router.post('/folder/create', FolderController.create);
+router.post('/folder/create', checkDest, checkErr, FolderController.create);
 //count пагинация param ctime noEmpty
 //extended = array<idForFullInfo>
 //:dest:extended:offset:count:sort(name of field)
-router.get('/folder/getView', FolderController.getView);
+router.get('/folder/getView', checkDest, checkErr, FolderController.getView);
 ///:dest
-router.get('/folder/download', FolderController.read);
+router.get('/folder/download', checkDest, checkErr, FolderController.read);
 //:dest:newName
-router.put('/folder/update', FolderController.update);
+router.put('/folder/update', checkDest, checkErr, FolderController.update);
 //:dest
-router.delete('/folder', FolderController.delete);
+router.delete('/folder', checkDest, checkErr, FolderController.delete);
 
 
 

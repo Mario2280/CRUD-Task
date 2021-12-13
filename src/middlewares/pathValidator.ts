@@ -35,7 +35,7 @@ const checkDest = check('dest', 'Dest is reqired').not().isEmpty()
     }
     return dest;
 })
-.custom(async value => {
+.custom(async (value, {req}) => {
     const thisPath = join(STORAGE, value);
     if(value === ''){
         return Promise.reject(`You can save files only in folder`);
@@ -50,6 +50,10 @@ const checkDest = check('dest', 'Dest is reqired').not().isEmpty()
     if (!existDest) {
         return Promise.reject(`Path ${value} doesn't exist`);
     }
+    if((<string>req.url).match('folder') && req.method === 'POST' && existDest) {
+        return Promise.reject(`Folder ${value} already exists`);
+    }
+    
 });
 
 
