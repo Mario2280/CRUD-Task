@@ -3,7 +3,7 @@ import FolderController from "../controllers/folderController";
 import { Router } from "express";
 import upload from "../middlewares/multer";
 
-import createValidator, {checkErr} from "../middlewares/pathValidator";
+import  {checkErr, sanitazeName, checkDest} from "../middlewares/pathValidator";
 const router = Router();
 
 //Endpoints
@@ -13,17 +13,17 @@ const router = Router();
 //query names a,c,v,b without ext
 //validators
 //path to upload exists?
-router.post('/file/create', createValidator, checkErr , upload, FileController.create);
+router.post('/file/create', checkDest, sanitazeName, checkErr , upload, FileController.create);
 //:dest = path + fileName
-router.get('/file/download', FileController.read);
+router.get('/file/download', checkDest, checkErr, FileController.read);
 //:dest = path + fileName + ext
-router.get('/file/getView', FileController.getView);
+router.get('/file/getView', checkDest, checkErr, FileController.getView);
 //Prop in json & dest in query
-router.put('/file/update/changeProp', FileController.update);
+router.put('/file/update/changeProp', checkDest, checkErr, FileController.update);
 //:dest = path(Cannot upload files with the same names)
 //query names a,c,v,b without ext
-router.put('/file/update/rewrite',upload, FileController.rewrite);
-router.delete('/file', FileController.delete);
+router.put('/file/update/rewrite', checkDest, checkErr, upload, FileController.rewrite);
+router.delete('/file', checkDest, checkErr, FileController.delete);
 
 //:dest = path + folderName
 router.post('/folder/create', FolderController.create);

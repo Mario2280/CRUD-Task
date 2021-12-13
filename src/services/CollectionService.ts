@@ -31,7 +31,7 @@ class CollectionService {
             extname:parsedDest.ext 
             });
         if (candidate) {
-            throw new Error(`File ${parsedDest.name} already exists, you overwritten it`);
+            return parsedDest.name;
         } else {
             const newFile = new Collection({
                 name: parsedDest.name,

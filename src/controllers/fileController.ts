@@ -37,14 +37,23 @@ class FileController implements ModIControl {
         //validate dest exist 
         try {
             let rebuiltPath;
+            const dontSaved = [];
             for (let i = 0; i < copyNameArrForDB.length; i++) {
                 rebuiltPath = join(
                     STORAGE,
                     <string>req.query.dest,
                     copyNameArrForDB[i]);
-                await fileService.createFile(rebuiltPath)
+                const candidate = await fileService.createFile(rebuiltPath);
+                if(candidate){
+                    dontSaved.push(candidate);
+                }
             }
-            res.status(200).send("OK");
+            if(dontSaved.length){
+                res.status(200).send(`File(s) ${dontSaved} already exists, you overwritten it`);
+            } else {
+                res.status(200).send("OK");
+            }
+            
         }
         catch (error) {
             res.status(500).send((<Error>error).message);

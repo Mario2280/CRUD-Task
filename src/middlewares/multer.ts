@@ -1,9 +1,7 @@
 import multer from "multer";
 import { join, extname, dirname, parse, basename } from "path";
 import { Request, Response, NextFunction } from "express";
-import fileService from "../services/CollectionService"
 import {config} from "dotenv";
-import Collection from "../models/CollectionSchema";
 config({path: join(__dirname, "../../")});
 
 let copyNameArrForDB : Array<string> = [];
