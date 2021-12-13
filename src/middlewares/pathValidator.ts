@@ -1,6 +1,6 @@
 import Collection from "../models/CollectionSchema";
 import { check, validationResult } from "express-validator"
-import { join, parse } from "path";
+import { dirname, join, parse } from "path";
 import { Request, Response, NextFunction } from "express";
 
 const STORAGE = join(__dirname, '../../DiskStorage');
@@ -22,13 +22,13 @@ function checkErr(req: Request, res: Response, next: NextFunction) {
     next();
 }
 
-const sanitazeName = check('names', 'Names is reqired').not().isEmpty()
+const sanitazeName = check('names', 'Names is reqired').notEmpty()
 .customSanitizer(names => {
     const sanitizedNames = (<string>names).split(',').map(el => el.replaceAll(" ", "")).join();
     return sanitizedNames;
 });
 
-const checkDest = check('dest', 'Dest is reqired').not().isEmpty()
+const checkDest = check('dest', 'Dest is reqired').notEmpty()
 .customSanitizer(dest => {
     const str: string = dest;
     if (str[str.length - 1] === "\\" || str[str.length - 1] === "/") {
@@ -46,12 +46,19 @@ const checkDest = check('dest', 'Dest is reqired').not().isEmpty()
         name: parsedPath.name,
         path: parsedPath.dir,
     };
-    parsedPath.ext ? filter.extname = parsedPath.ext : null;
     const existDest = await Collection.exists(filter);
-    if (!existDest) {
-        return Promise.reject(`Path ${value} doesn't exist`);
-    }
-    if((<string>req.url).match('folder') && req.method === 'POST' && existDest) {
+    parsedPath.ext ? filter.extname = parsedPath.ext : null;
+    if((<string>req.url).match('folder') && req.method === 'POST'){
+        if(!await Collection.exists({path:parsedPath.dir})){ 
+            return Promise.reject(`Path ${value} doesn't exist`);
+        }
+    } else {
+        
+        if (!existDest) {
+            return Promise.reject(`Path ${value} doesn't exist`);
+        }
+    }   
+    if((<string>req.url).match('folder')?.length && req.method === 'POST' && existDest) {
         return Promise.reject(`Folder ${value} already exists`);
     }
     
@@ -75,9 +82,21 @@ const checkCount = check('count').isInt({min:0})
     }
 });
 
+const checknewName = check('newName').notEmpty().not().contains( "/").not().contains( ".")
+.custom(async (value, {req}) => {
+    let newpath = join(STORAGE,parse(<string>req.query?.dest).dir);
+    if (newpath[newpath.length - 1] === "\\" || newpath[newpath.length - 1] === "/") {
+        newpath = newpath.slice(0, newpath.length - 1).replaceAll(" ", "");
+    }
+    const candidate = await Collection.exists({path: newpath, name : value}); 
+    if(candidate){
+        throw new Error(`Folder ${value} already exists`);
+    }
+});
+
 const checkGetViewQuery = [checkOffset,checkCount]
 
 
 
-export { checkErr, sanitazeName, checkDest, checkGetViewQuery };
+export { checkErr, sanitazeName, checkDest, checkGetViewQuery, checknewName };
 
