@@ -1,53 +1,58 @@
 import multer from "multer";
-import { join, extname } from "path";
+import { join, extname, dirname, parse, basename } from "path";
 import { Request, Response, NextFunction } from "express";
 import fileService from "../services/CollectionService"
-
+import {config} from "dotenv";
+import Collection from "../models/CollectionSchema";
+config({path: join(__dirname, "../../")});
 
 let copyNameArrForDB : Array<string> = [];
 
 
 class Multer {
     
-    #mineArr: string[] = ["image/png", "audio/mp4", "video/mp4"];
+    #mineArr: string[] | undefined = process.env.minetypes?.split(" ");
     #STORAGE = join(__dirname, '../../DiskStorage/');
     #maxSize: number = 1024 * 1024 * 40;
     public nameArr: Array<string> = [];
+    public nameArrSecondary: Array<string> = [];
     public copyNameArrForDB: Array<string> = [];
     public isPut = false;
     
     
     #storage = multer.diskStorage({
         destination:  (req, _, cb) => {
-            const newPath = join(this.#STORAGE, req.query.dest?.toString().trim() as string);
-            cb(null, newPath);
+            if(!this.isPut) {
+                const newPath = join(this.#STORAGE, <string>req.query.dest);
+                cb(null, newPath);
+            } else {
+                const newPath = join(this.#STORAGE, dirname(<string>req.query.dest));
+                cb(null, newPath);
+            }
+            
         },
         filename: async (req, file, cb) => {
-            const Fullname = `${<string>this.nameArr.pop() ?? file.originalname}${extname(file.originalname)}`;
-            this.copyNameArrForDB.push(Fullname);
-            cb(null, Fullname);
+            if(!this.isPut) {
+                const Fullname = `${<string>this.nameArr.pop() ?? basename(file.originalname)}${extname(file.originalname)}`;
+                this.copyNameArrForDB.push(Fullname);
+                cb(null, Fullname);
+            } else {
+                const Fullname = `${parse(<string>req.query.dest).name}${parse(<string>req.query.dest).ext ?? extname(file.originalname)}`;
+                this.copyNameArrForDB.push(Fullname);
+                cb(null, Fullname);
+            }            
         }
     });
     
     #myMulter = multer({
         storage: this.#storage,
         fileFilter: (req, file, cb) => {
-            if (!this.isPut) {
-                const rev = this.nameArr.reverse();
-                rev.forEach(async el => {
-                    const testPath = join(this.#STORAGE, <string>req.query.dest, el);
-                    await fileService.getViewFile(testPath).then(res => {
-                        if (res) {
-                            cb(null, false);
-                        }
-                    });
-                });
-            }
-            if (!this.#mineArr.includes(file.mimetype)) {
+            if (!this.#mineArr?.includes(file.mimetype)) {
                 cb(null, false);
             } else {
                 cb(null, true);
             }
+            
         },
         limits: { fieldSize: this.#maxSize }
     });
@@ -56,9 +61,13 @@ class Multer {
 
     #Multiple = this.#myMulter.fields([{ name: 'file', maxCount: 3 }]);
 
-    public ReadNewFileNames(req: Request) {
+    public ReadNewFileNames(req: Request) {        
+        if(this.#mineArr == undefined){
+            throw new Error(`minetypes is not defined`);
+        }
         this.nameArr = (<string>req.query.names).split(',');
         this.nameArr = this.nameArr.reverse();
+        this.nameArrSecondary = Array.from(this.nameArr);
         return this.#ConfigMulter(req);
     }
     #ConfigMulter(req: Request){
@@ -81,7 +90,7 @@ const Upload = function (req: Request, res: Response, next: NextFunction) {
             if (err instanceof multer.MulterError) {
                 res.status(400).send(err.code);
             } else {
-                res.send(err.message ?? `Not all files were uploaded or you specified a wrong quantity of query parameters`);
+                res.send(err.message ? err.message : `Not all files were uploaded or you specified a wrong quantity of query parameters`);
             }
         }
         copyNameArrForDB = downloader.copyNameArrForDB;
