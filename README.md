@@ -31,7 +31,7 @@ ESLint пока не работает позже докомичу. Валида�
  + DELETE http://localhost:5000/api/file/update/rewrite?dest=/&names=ASD.png
  ### Folder routes
  + POST http://localhost:5000/api/folder/create?dest=/b/asd
- + GET http://localhost:5000/api/folder/create?dest=/b/asd был ещё query extended но он потерял свой смысл т.к я и так возвращаю всю инфу. Query ***sort*** указываем по какому полю хотим отсортировать (ctime extname name )
+ + GET http://localhost:5000/api/folder/create?dest=/b/asd&offset=1&count=1 был ещё query extended но он потерял свой смысл т.к я и так возвращаю всю инфу. Query ***sort*** указываем по какому полю хотим отсортировать (ctime extname name ), offset и count для пагинации.
  + GET http://localhost:5000/api/folder/download?dest=b/
  + PUT http://localhost:5000/api/folder/update?dest=a&newName=b   Путь к папке и новое её имя
  
