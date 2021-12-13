@@ -1,10 +1,11 @@
 import Collection from "../models/CollectionSchema";
 import { check, validationResult } from "express-validator"
-import { join, basename, parse } from "path";
+import { join, parse } from "path";
 import { Request, Response, NextFunction } from "express";
 
 const STORAGE = join(__dirname, '../../DiskStorage');
-
+let maxCount : number;
+let requestCount  = 0;
 interface IFilter{ 
     path: string,
     name:string,
@@ -14,7 +15,7 @@ interface IFilter{
 function checkErr(req: Request, res: Response, next: NextFunction) {
     const errorValidation = validationResult(req);
     if (!errorValidation.isEmpty()) {
-        return res.status(500).json({
+        return res.status(400).json({
             error: errorValidation.array()[0].msg
         });
     }
@@ -56,7 +57,27 @@ const checkDest = check('dest', 'Dest is reqired').not().isEmpty()
     
 });
 
+const checkOffset = check('offset').isInt({min:0})
+.custom(async (value, {req}) => {
+    const absolutePath = join(STORAGE,<string>req.query?.dest)
+    maxCount = await Collection.count({ path:absolutePath});
+    requestCount+=parseInt(value, 10);
+    if(requestCount> maxCount){
+        throw new Error(`Offset is more than maxCount`);
+    }
+});
+
+const checkCount = check('count').isInt({min:0})
+.custom(value => {
+    requestCount += parseInt(value, 10);
+    if(requestCount > maxCount){
+        throw new Error(`Offset + count is more than maxCount`)
+    }
+});
+
+const checkGetViewQuery = [checkOffset,checkCount]
 
 
-export { checkErr, sanitazeName, checkDest };
+
+export { checkErr, sanitazeName, checkDest, checkGetViewQuery };
 

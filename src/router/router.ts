@@ -3,7 +3,7 @@ import FolderController from "../controllers/folderController";
 import { Router } from "express";
 import upload from "../middlewares/multer";
 
-import  {checkErr, sanitazeName, checkDest} from "../middlewares/pathValidator";
+import  {checkErr, sanitazeName, checkDest, checkGetViewQuery} from "../middlewares/pathValidator";
 const router = Router();
 
 //Endpoints
@@ -30,7 +30,7 @@ router.post('/folder/create', checkDest, checkErr, FolderController.create);
 //count пагинация param ctime noEmpty
 //extended = array<idForFullInfo>
 //:dest:extended:offset:count:sort(name of field)
-router.get('/folder/getView', checkDest, checkErr, FolderController.getView);
+router.get('/folder/getView', checkDest, checkGetViewQuery, checkErr, FolderController.getView);
 ///:dest
 router.get('/folder/download', checkDest, checkErr, FolderController.read);
 //:dest:newName

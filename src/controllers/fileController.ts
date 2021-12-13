@@ -28,7 +28,6 @@ async function changePropInFs(props: { name?: string, path?: string, extname?: s
             name: parse(newDest).name
         };
         await fileService.changeCollectionProp(absolutePath, Prop);
-        //return fileInDB;
     }
 }
 
