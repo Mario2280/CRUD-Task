@@ -3,7 +3,7 @@ import FolderController from "../controllers/folderController";
 import { Router } from "express";
 import upload from "../middlewares/multer";
 
-import  {checkErr, sanitazeName, checkDest, checkGetViewQuery, checknewName} from "../middlewares/pathValidator";
+import  {checkErr, sanitazeName, checkDest, checknewName} from "../middlewares/pathValidator";
 const router = Router();
 
 
@@ -15,7 +15,7 @@ router.put('/file/update/rewrite', checkDest, checkErr, upload, FileController.r
 router.delete('/file', checkDest, checkErr, FileController.delete);
 
 router.post('/folder/create', checkDest, checkErr, FolderController.create);
-router.get('/folder/getView', checkDest, checkGetViewQuery, checkErr, FolderController.getView);
+router.get('/folder/getView', checkDest, checkErr, FolderController.getView);
 router.get('/folder/download', checkDest, checkErr, FolderController.read);
 router.put('/folder/update', checkDest, checknewName, checkErr, FolderController.update);
 router.delete('/folder', checkDest, checkErr, FolderController.delete);

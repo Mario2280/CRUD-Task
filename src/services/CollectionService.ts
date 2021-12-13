@@ -8,6 +8,11 @@ interface INewProp {
     extname?: string;
 }
 
+interface IFilter{ 
+    path: string,
+    [key:string]:string
+}
+
 const CheckAndChangeEmptyStatusParentFolder = async function (oldDest: string | '', newDest: string | '') {
     if (oldDest !== newDest) {
         if (!oldDest) {
@@ -65,13 +70,17 @@ class CollectionService {
             await CheckAndChangeEmptyStatusParentFolder('', parsedDest.dir);
         }
     }
-    async getViewFolder(dest: string, extended: Array<string>, offset: number, count: number, sortField?: string) {
+    async getViewFolder(dest: string, extended: Array<string>, offset: number, count: number,onlyWithExt:string | null, sortField?: string) {
         let sortBy;
-        const hasSortFieldProperty = Object.prototype.hasOwnProperty.call(Collection, <string>sortField);
-        if (sortField && hasSortFieldProperty) {
-            sortBy = `+${sortField}`;
+        
+        if (sortField && ['extname','name','ctime', 'isEmpty'].includes(sortField)) {
+            sortBy = sortField;
         }
-        const View = await Collection.find({ path: dest }).sort(sortBy)
+        const filter : IFilter = {
+            path: dest,
+        }
+        onlyWithExt ? filter.extname = onlyWithExt : null;
+        const View = await Collection.find(filter).sort([[sortBy, -1]])
             .select('name path extname').skip(offset ?? 0).limit(count ?? 0).lean();
         if (extended.length) {
             for await (const el of extended) {

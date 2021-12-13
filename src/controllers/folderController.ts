@@ -58,6 +58,7 @@ class FolferController implements IControl {
         try {
             let extendedArray;
             const sortBy = <string>req.query.sort;
+            const onlyWithExt = <string>req.query.extname;
             if (req.query.dest) {
                 res.status(200);
                 const absolutePath = join(STORAGE, <string>req.query.dest);
@@ -71,6 +72,7 @@ class FolferController implements IControl {
                     extendedArray ?? [],
                     isNaN(offset) ? 0 : offset,
                     isNaN(count) ? 0 : count,
+                    onlyWithExt,
                     sortBy
                 );
                 if (records) {
