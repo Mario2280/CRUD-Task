@@ -27,7 +27,7 @@ ESLint пока не работает позже докомичу. Валида�
      "name": "someName"
  } 
  ```
- + PUT http://localhost:5000/api/file/update/rewrite?dest=/&names=ASD Query dest: относительный путь к файлу, который хотим перезаписать. names: имя файла без расширения. 
+ + PUT http://localhost:5000/api/file/update/rewrite?dest=/&names=ASD.png Query dest: относительный путь к файлу, который хотим перезаписать. names: имя файла. 
  + DELETE http://localhost:5000/api/file/update/rewrite?dest=/&names=ASD
  ### Folder routes
  + POST http://localhost:5000/api/folder/create?dest=/b/asd
