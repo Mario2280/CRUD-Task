@@ -94,6 +94,8 @@ const checknewName = check('newName').notEmpty().not().contains( "/").not().cont
     }
 });
 
+
+
 const checkGetViewQuery = [checkOffset,checkCount]
 
 
